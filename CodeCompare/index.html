@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Code Comparison Tool</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .container {
+      display: flex;
+      gap: 20px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 300px;
+      font-family: monospace;
+      font-size: 14px;
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .results {
+      font-weight: bold;
+    }
+
+    .output {
+      white-space: pre-wrap;
+      font-family: monospace;
+      padding: 10px;
+      border: 1px solid #ccc;
+      min-height: 200px;
+      background-color: #f9f9f9;
+    }
+
+    .added {
+      background-color: #d4fcd4;
+    }
+
+    .omitted {
+      background-color: #fcd4d4;
+      text-decoration: line-through;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Code Comparison Tool</h2>
+
+  <div class="container">
+    <textarea id="text1" placeholder="Original code..."></textarea>
+    <textarea id="text2" placeholder="Modified code..."></textarea>
+  </div>
+
+  <div class="buttons">
+    <button onclick="compareTexts()">Compare</button>
+    <button onclick="clearAll()">Clear All</button>
+  </div>
+
+  <div class="results" id="summary"></div>
+
+  <div class="output" id="diffOutput"></div>
+
+  <script>
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, tag => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[tag]));
+    }
+
+    function compareTexts() {
+      const text1 = document.getElementById('text1').value.trim();
+      const text2 = document.getElementById('text2').value.trim();
+
+      const lines1 = text1.split('\n');
+      const lines2 = text2.split('\n');
+
+      let result = '';
+      let additions = 0;
+      let omissions = 0;
+      let i = 0, j = 0;
+
+      while (i < lines1.length || j < lines2.length) {
+        const line1 = lines1[i] || '';
+        const line2 = lines2[j] || '';
+
+        if (line1 === line2) {
+          result += escapeHtml(line2) + '\n';
+          i++;
+          j++;
+        } else {
+          // Show omitted line from text1
+          if (line1 && !lines2.includes(line1)) {
+            result += `<span class="omitted">${escapeHtml(line1)}</span>\n`;
+            i++;
+            omissions++;
+          } 
+          // Show added line from text2
+          else if (line2 && !lines1.includes(line2)) {
+            result += `<span class="added">${escapeHtml(line2)}</span>\n`;
+            j++;
+            additions++;
+          } 
+          // Both lines exist but are different
+          else {
+            result += `<span class="omitted">${escapeHtml(line1)}</span>\n`;
+            result += `<span class="added">${escapeHtml(line2)}</span>\n`;
+            i++;
+            j++;
+            additions++;
+            omissions++;
+          }
+        }
+      }
+
+      document.getElementById('diffOutput').innerHTML = result;
+      document.getElementById('summary').innerText = `Additions: ${additions}, Omissions: ${omissions}`;
+    }
+
+    function clearAll() {
+      document.getElementById('text1').value = '';
+      document.getElementById('text2').value = '';
+      document.getElementById('diffOutput').innerHTML = '';
+      document.getElementById('summary').innerText = '';
+    }
+  </script>
+
+</body>
+</html>
