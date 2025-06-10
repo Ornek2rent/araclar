@@ -1,0 +1,1 @@
+This program was developed by ornekrent@gmail.com on 09.06.2025 using ChatGPT under heading "AI Agent Management Tool"
